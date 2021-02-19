@@ -1,5 +1,3 @@
-"""Author: Keren Halpert."""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -439,9 +437,9 @@ def combine_tower_baron_and_jungles(df):
         'jungleDiff' - the difference in the number of jungle minions killed by the team,
          if the value is positive, then the red team was the one that killed more blue minions
          if the value is negative, then the blue team was the one that killed more red minions.
-        'towerBaron' - If the winning team was able to achieve both 'FisrtTower' and 'FirstBaron' then the value is 2,
-         if the winning team was able to achieve only one, either 'FisrtTower' or 'FirstBaron' then the value is 1,
-         if the winning team was not able to achieve both 'FisrtTower' and 'FirstBaron' then the value is 0,
+        'towerBaron' - If the winning team was able to achieve both 'FirstTower' and 'FirstBaron' then the value is 2,
+         if the winning team was able to achieve only one, either 'FirstTower' or 'FirstBaron' then the value is 1,
+         if the winning team was not able to achieve both 'FirstTower' and 'FirstBaron' then the value is 0,
     """
     df.replace('Red', 0, inplace=True)
     df.replace('Blue', 1, inplace=True)
