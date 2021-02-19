@@ -1,3 +1,5 @@
+"""Author: Keren Halpert."""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +16,9 @@ from IPython.display import Image
 
 
 def full_correlation_heatmap(df):
+    """ Create and display a full correlation heatmap for data,
+        including both numerical and categorical values.
+    """
     plt.figure(figsize=(12, 8))
     color_map = plt.cm.get_cmap('rocket')
     reversed_color_map = color_map.reversed()
@@ -27,6 +32,7 @@ def full_correlation_heatmap(df):
 
 
 def outlier_box_plots(df):
+    """ Create and display box plots for the purpose of finding outliers in the numerical value columns."""
     sns.set_theme(style="whitegrid")
     plt.figure(figsize=(15, 10))
 
@@ -98,6 +104,7 @@ def outlier_box_plots(df):
 
 
 def outlier_dist_plot(df):
+    """ Create and display distribution plots for the purpose of finding outliers in the numerical value columns."""
     sns.set_theme(style="whitegrid")
 
     sns.displot(df, x="gameDuraton", kde=True)
@@ -135,6 +142,7 @@ def outlier_dist_plot(df):
 
 
 def first_blood_hist(df):
+    """ Create and display kde plot of the categorical column: FirstBlood."""
     df = df.replace('Red', 0)
     df = df.replace('Blue', 1)
     sns.kdeplot((df['FirstBlood'][df['win'] == 0]), color='red')
@@ -144,6 +152,7 @@ def first_blood_hist(df):
 
 
 def first_tower_hist(df):
+    """ Create and display kde plot of the categorical column: FirstTower."""
     df = df.replace('Red', 0)
     df = df.replace('Blue', 1)
     sns.kdeplot((df['FirstTower'][df['win'] == 0]), color='red')
@@ -153,6 +162,7 @@ def first_tower_hist(df):
 
 
 def first_baron_hist(df):
+    """ Create and display kde plot of the categorical column: FirstBaron."""
     df = df.replace('Red', 0)
     df = df.replace('Blue', 1)
     sns.kdeplot((df['FirstBaron'][df['win'] == 0]), color='red')
@@ -162,6 +172,7 @@ def first_baron_hist(df):
 
 
 def first_dragon_hist(df):
+    """ Create and display kde plot of the categorical column: FirstDragon."""
     df = df.replace('Red', 0)
     df = df.replace('Blue', 1)
     sns.kdeplot((df['FirstDragon'][df['win'] == 0]), color='red')
@@ -171,12 +182,14 @@ def first_dragon_hist(df):
 
 
 def duration_hist(df):
+    """ Create and display kde plot of the game duration, in reference to the winning team."""
     sns.kdeplot((df['gameDuration'][df['win'] == 'Red']), color='red')
     sns.kdeplot((df['gameDuration'][df['win'] == 'Blue']), color='blue')
     plt.show()
 
 
 def combined_columns_bar_plots_cat(df):
+    """ Create and display bar count plots of the categorical columns in reference to the winner."""
     sns.set_theme(style="whitegrid")
     plt.figure(figsize=(15, 10))
 
@@ -200,6 +213,7 @@ def combined_columns_bar_plots_cat(df):
 
 
 def combined_columns_box_plots_num(df):
+    """ Create and display box plots of the numerical columns by comparing winner vs. loser."""
     sns.set_theme(style="whitegrid")
     plt.figure(figsize=(15, 10))
 
@@ -265,6 +279,7 @@ def combined_columns_box_plots_num(df):
 
 
 def red_data_pair_plot(df):
+    """ Create and display scatter pair plot of the red team numerical columns."""
     red_data = df.drop(['blueWardPlaced', 'blueWardKills', 'blueTotalMinionKills',
                         'blueJungleMinionKills', 'blueTotalHeal'], axis=1)
     sns.pairplot(red_data, hue='win', hue_order=['Blue', 'Red'], palette=['blue', 'red'])
@@ -272,6 +287,7 @@ def red_data_pair_plot(df):
 
 
 def blue_data_pair_plot(df):
+    """ Create and display scatter pair plot of the blue team numerical columns."""
     blue_data = df.drop(['redWardPlaced', 'redWardKills', 'redTotalMinionKills',
                          'redJungleMinionKills', 'redTotalHeal'], axis=1)
     sns.pairplot(blue_data, hue='win', hue_order=['Blue', 'Red'], palette=['blue', 'red'])
@@ -279,6 +295,9 @@ def blue_data_pair_plot(df):
 
 
 def opponent_pair_plot(df, kind):
+    """ Create and display pair plot of the numerical columns of the red team vs. the blue team.
+        choose the kind of plot (scatter/kde'...) by 'kind' :argument
+    """
     sns.pairplot(data=df, hue='win', hue_order=['Blue', 'Red'], palette=['blue', 'red'], kind=kind,
                  y_vars=['redWardPlaced', 'redWardKills', 'redTotalMinionKills',
                          'redJungleMinionKills', 'redTotalHeal'],
@@ -288,6 +307,9 @@ def opponent_pair_plot(df, kind):
 
 
 def six_zero_columns(df):
+    """ Create and display a distribution plot of the row in the dataset that have 6 zero values
+        in regards to the game duration. Also print the number of said rows.
+    """
     six_zeros = df[(df["blueWardPlaced"] == 0) & (df["redWardPlaced"] == 0) &
                    (df["blueWardkills"] == 0) & (df["redWardkills"] == 0) &
                    (df["blueJungleMinionKills"] == 0) & (df["redJungleMinionKills"] == 0)]
@@ -297,12 +319,14 @@ def six_zero_columns(df):
 
 
 def clear_six_zero_rows(df):
+    """ Remove the rows that contain 6 zeros from the dataset."""
     df.drop(df[(df["blueWardPlaced"] == 0) & (df["redWardPlaced"] == 0) &
                (df["blueWardkills"] == 0) & (df["redWardkills"] == 0) &
                (df["blueJungleMinionKills"] == 0) & (df["redJungleMinionKills"] == 0)].index, inplace=True)
 
 
 def clear_outliers(df):
+    """ Remove the rows that contain blatant outliers from the dataset."""
     df.drop(df[(df["redWardPlaced"] > 190)].index, inplace=True)
     df.drop(df[(df["redWardkills"] > 100)].index, inplace=True)
     df.drop(df[(df["redTotalMinionKills"] > 1200)].index, inplace=True)
@@ -315,6 +339,7 @@ def clear_outliers(df):
 
 
 def replace_missing_values(df):
+    """ Replace the missing values (NaN) with the mean (if numerical) or mode (if categorical) of the column."""
     df['blueWardPlaced'].fillna(round((df['blueWardPlaced'].mean()), 2), inplace=True)
     df['blueWardkills'].fillna(round((df['blueWardkills'].mean()), 2), inplace=True)
     df['blueTotalMinionKills'].fillna(round((df['blueTotalMinionKills'].mean()), 2), inplace=True)
@@ -334,6 +359,10 @@ def replace_missing_values(df):
 
 
 def combine_numerical_columns(df):
+    """ Replace the ten columns of the team vs. team achievements with ten winner vs. loser achievements.
+        The winner columns will contain the value that the winning team reached
+        and the opposite fot the loser columns
+    """
     df['winnerWardPlaced'] = df.apply(
         lambda row: compare_winning_team_num(row['redWardPlaced'], row['blueWardPlaced'], row['win']), axis=1)
     df['winnerWardKills'] = df.apply(
@@ -368,6 +397,7 @@ def combine_numerical_columns(df):
 
 
 def compare_winning_team_num(red_val, blue_val, winner):
+    """ Helper method for 'combine_numerical_columns' to decide the winner value."""
     if winner == 'Blue':
         return blue_val
     else:
@@ -375,6 +405,7 @@ def compare_winning_team_num(red_val, blue_val, winner):
 
 
 def compare_losing_team_num(red_val, blue_val, winner):
+    """ Helper method for 'combine_numerical_columns' to decide the loser value."""
     if winner == 'Blue':
         return red_val
     else:
@@ -382,6 +413,11 @@ def compare_losing_team_num(red_val, blue_val, winner):
 
 
 def combine_categorical_columns(df):
+    """ Replace the four columns of the 'First' achievements
+        with four columns determining if the winning team was the achiever or not.
+        If the winning team was the first to achieve the topic then the new value will be '1',
+        if it was the losing team then the value will be '0'.
+    """
     df['FirstBlood'] = df.apply(lambda row: compare_team_cat(row['FirstBlood'], row['win']), axis=1)
     df['FirstTower'] = df.apply(lambda row: compare_team_cat(row['FirstTower'], row['win']), axis=1)
     df['FirstBaron'] = df.apply(lambda row: compare_team_cat(row['FirstBaron'], row['win']), axis=1)
@@ -391,6 +427,7 @@ def combine_categorical_columns(df):
 
 
 def compare_team_cat(val, winner):
+    """ Helper method for 'combine_categorical_columns' to decide the value."""
     if winner == val:
         return 1
     else:
@@ -398,6 +435,14 @@ def compare_team_cat(val, winner):
 
 
 def combine_tower_baron_and_jungles(df):
+    """ Add two columns:
+        'jungleDiff' - the difference in the number of jungle minions killed by the team,
+         if the value is positive, then the red team was the one that killed more blue minions
+         if the value is negative, then the blue team was the one that killed more red minions.
+        'towerBaron' - If the winning team was able to achieve both 'FisrtTower' and 'FirstBaron' then the value is 2,
+         if the winning team was able to achieve only one, either 'FisrtTower' or 'FirstBaron' then the value is 1,
+         if the winning team was not able to achieve both 'FisrtTower' and 'FirstBaron' then the value is 0,
+    """
     df.replace('Red', 0, inplace=True)
     df.replace('Blue', 1, inplace=True)
 
@@ -409,6 +454,7 @@ def combine_tower_baron_and_jungles(df):
 
 
 def compare_tower_baron(cat1, cat2, winner):
+    """ Helper method for 'combine_tower_baron_and_jungles' to decide the value."""
     if cat1 == cat2:
         if cat1 == winner:
             return 2
@@ -419,6 +465,7 @@ def compare_tower_baron(cat1, cat2, winner):
 
 
 def stat_diff_winner_loser_num(df):
+    """ Calculate and print the mean of the new numerical columns and their increase percentage."""
     win_val = df['winnerWardPlaced'].mean()
     lose_val = df['loserWardPlaced'].mean()
     print('winnerWardPlaced:        ', round(win_val, 2))
@@ -451,6 +498,7 @@ def stat_diff_winner_loser_num(df):
 
 
 def stat_diff_winner_loser_cat(df):
+    """ Calculate and print the mean of the new categorical columns and their increase percentage."""
     win_val = df['FirstBlood'].mean()
     lose_val = 1 - win_val
     print('winnerFirstBlood:        ', round(win_val, 2))
@@ -477,11 +525,13 @@ def stat_diff_winner_loser_cat(df):
 
 
 def calculate_percent(win_val, lose_val):
+    """ Helper method for the two 'stat_diff' functions to decide the increase percent."""
     increase_percent = ((win_val - lose_val) / lose_val) * 100
     print('increase percent:        ', round(increase_percent, 2), '%\n')
 
 
 def gaussian_naive_bayes(data, target):
+    """ Create a Gaussian Naive Bayes classification model, with train size: 80%"""
     x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
     gnb_model = GaussianNB()
     gnb_model.fit(x_train, y_train.values.ravel())
@@ -490,6 +540,9 @@ def gaussian_naive_bayes(data, target):
 
 
 def accuracy_score_comparison(df):
+    """ Compare and print the accuracy scores of the Gaussian Naive Bayes classification model
+        using different pairs of features
+    """
     target = df[['win']]
 
     print("'FirstTower' and 'FirstBaron'")
@@ -510,6 +563,7 @@ def accuracy_score_comparison(df):
 
 
 def gnb_accuracy_score(data, target):
+    """ Calculate the accuracy score of the Gaussian Naive Bayes classification model"""
     x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
     gnb_model = GaussianNB()
     gnb_model.fit(x_train, y_train.values.ravel())
@@ -520,6 +574,7 @@ def gnb_accuracy_score(data, target):
 
 
 def gnb_filled_contour(data, target):
+    """ Create the visualization of the decision boundaries of the Gaussian Naive Bayes classification model"""
     clf = gaussian_naive_bayes(data, target)
 
     x_min, x_max = data.loc[:, 'towerBaron'].min() - 1, data.loc[:, 'towerBaron'].max() + 1
@@ -541,6 +596,9 @@ def gnb_filled_contour(data, target):
 
 
 def gnb_contour_with_failed_scatter(data, target):
+    """ Overlay the visualization of the failed predictions of the GNBs classification model in a scatter plot
+        on the decision boundaries plot
+    """
     clf = gaussian_naive_bayes(data, target)
 
     ax = gnb_filled_contour(data, target)
@@ -568,6 +626,10 @@ def gnb_contour_with_failed_scatter(data, target):
 
 
 def decision_tree_clf_report(data, target, depth, report):
+    """ Create a Decision Tree Classifier model, with train size: 80%,
+        depth size determined by the 'depth' :argument.
+        Also print the classification report if 'report' :argument is True
+    """
     x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
     clf = DecisionTreeClassifier(max_depth=depth)
     clf = clf.fit(x_train, y_train)
@@ -579,6 +641,9 @@ def decision_tree_clf_report(data, target, depth, report):
 
 
 def tree_permutation_importance_plot(data, target, depth=None):
+    """ Create and display the permutation importance of the Decision Tree Classifier model,
+        depth size determined by the 'depth' :argument.
+    """
     clf = decision_tree_clf_report(data, target, depth, report=True)
     result = permutation_importance(clf, data, target, n_repeats=10, random_state=0)
     plt.bar(range(len(data.columns)), result['importances_mean'])
@@ -588,6 +653,10 @@ def tree_permutation_importance_plot(data, target, depth=None):
 
 
 def tree_visualization(data, target, img_name, depth=None):
+    """ Create and write to file the tree of the Decision Tree Classifier model,
+        depth size determined by the 'depth' :argument,
+        image name determined by the 'img_name' :argument.
+    """
     clf = decision_tree_clf_report(data, target, depth, report=False)
     dot_data = StringIO()
     export_graphviz(clf, out_file=dot_data, filled=True, rounded=True,
@@ -598,12 +667,14 @@ def tree_visualization(data, target, img_name, depth=None):
 
 
 def intro():
+    """ Run the intro chapter methods."""
     df = pd.read_csv("lol5.csv")
     print(df.shape)
     print(df.dtypes)
 
 
 def initial_data_analysis():
+    """ Run the initial data analysis chapter methods."""
     df = pd.read_csv("lol5.csv")
     df.drop(['gameId'], axis=1, inplace=True)
 
@@ -638,6 +709,7 @@ def initial_data_analysis():
 
 
 def exploratory_data_analysis():
+    """ Run the exploratory data analysis chapter methods."""
     df = pd.read_csv("clean_lol.csv")
     full_correlation_heatmap(df)
     duration_hist(df)
@@ -661,6 +733,7 @@ def exploratory_data_analysis():
 
 
 def classification_model():
+    """ Run the classification model chapter methods."""
     df = pd.read_csv("clean_lol.csv")
     df = combine_tower_baron_and_jungles(df)
 
