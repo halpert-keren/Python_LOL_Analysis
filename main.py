@@ -2,12 +2,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-
-# gameId, gameDuraton,
-# blueWardPlaced, blueWardkills, blueTotalMinionKills, blueJungleMinionKills, blueTotalHeal,
-#  redWardPlaced,  redWardkills,  redTotalMinionKills,  redJungleMinionKills,  redTotalHeal,
-# win, FirstBlood, FirstTower, FirstBaron, FirstDragon
+import pydotplus
+from io import StringIO
+from sklearn.inspection import permutation_importance
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import export_graphviz
+from IPython.display import Image
 
 
 def full_correlation_heatmap(df):
@@ -167,33 +170,9 @@ def first_dragon_hist(df):
     plt.show()
 
 
-def combined_columns_bar_plots_num(df):
-    sns.set_theme(style="whitegrid")
-    plt.figure(figsize=(15, 10))
-
-    plt.subplot(2, 2, 1)
-    sns.countplot(x="wardPlaced", palette=['grey', 'green'], data=df)
-    plt.xlabel('wardPlaced')
-
-    plt.subplot(2, 2, 2)
-    sns.countplot(x="wardKills", palette=['grey', 'green'], data=df)
-    plt.xlabel('wardKills')
-
-    plt.subplot(2, 2, 3)
-    sns.countplot(x="totalMinionKills", palette=['grey', 'green'], data=df)
-    plt.xlabel('totalMinionKills')
-
-    plt.subplot(2, 2, 4)
-    sns.countplot(x="jungleMinionKills", palette=['grey', 'green'], data=df)
-    plt.xlabel('jungleMinionKills')
-
-    plt.show()
-
-    plt.figure(figsize=(15, 10))
-
-    plt.subplot(2, 2, 1)
-    sns.countplot(x="totalHeal", palette=['grey', 'green'], data=df)
-    plt.xlabel('totalHeal')
+def duration_hist(df):
+    sns.kdeplot((df['gameDuration'][df['win'] == 'Red']), color='red')
+    sns.kdeplot((df['gameDuration'][df['win'] == 'Blue']), color='blue')
     plt.show()
 
 
@@ -220,7 +199,7 @@ def combined_columns_bar_plots_cat(df):
     plt.show()
 
 
-def combined_columns_box_plots(df):
+def combined_columns_box_plots_num(df):
     sns.set_theme(style="whitegrid")
     plt.figure(figsize=(15, 10))
 
@@ -285,12 +264,6 @@ def combined_columns_box_plots(df):
     plt.show()
 
 
-def duration_hist(df):
-    sns.kdeplot((df['gameDuration'][df['win'] == 'Red']), color='red')
-    sns.kdeplot((df['gameDuration'][df['win'] == 'Blue']), color='blue')
-    plt.show()
-
-
 def red_data_pair_plot(df):
     red_data = df.drop(['blueWardPlaced', 'blueWardKills', 'blueTotalMinionKills',
                         'blueJungleMinionKills', 'blueTotalHeal'], axis=1)
@@ -305,62 +278,12 @@ def blue_data_pair_plot(df):
     plt.show()
 
 
-def pair_plot(df, kind):
+def opponent_pair_plot(df, kind):
     sns.pairplot(data=df, hue='win', hue_order=['Blue', 'Red'], palette=['blue', 'red'], kind=kind,
                  y_vars=['redWardPlaced', 'redWardKills', 'redTotalMinionKills',
                          'redJungleMinionKills', 'redTotalHeal'],
                  x_vars=['blueWardPlaced', 'blueWardKills', 'blueTotalMinionKills',
                          'blueJungleMinionKills', 'blueTotalHeal'])
-    plt.show()
-
-
-def categorical_hist(df):
-    # win, FirstBlood, FirstTower, FirstBaron, FirstDragon,
-    # wardPlaced, wardKills, totalMinionKills, jungleMinionKills, totalHeal
-
-    sns.kdeplot((df['FirstBlood'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['FirstBlood'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  FirstBlood                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['FirstTower'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['FirstTower'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  FirstTower                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['FirstBlood'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['FirstBlood'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  FirstBlood                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['FirstDragon'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['FirstDragon'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  FirstDragon                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['wardPlaced'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['wardPlaced'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  wardPlaced                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['wardKills'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['wardKills'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  wardKills                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['totalMinionKills'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['totalMinionKills'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  totalMinionKills                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['jungleMinionKills'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['jungleMinionKills'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  jungleMinionKills                  blue won')
-    plt.show()
-
-    sns.kdeplot((df['totalHeal'][df['win'] == 0]), color='red')
-    sns.kdeplot((df['totalHeal'][df['win'] == 1]), color='blue')
-    plt.xlabel('red won                  totalHeal                  blue won')
     plt.show()
 
 
@@ -373,6 +296,12 @@ def six_zero_columns(df):
     plt.show()
 
 
+def clear_six_zero_rows(df):
+    df.drop(df[(df["blueWardPlaced"] == 0) & (df["redWardPlaced"] == 0) &
+               (df["blueWardkills"] == 0) & (df["redWardkills"] == 0) &
+               (df["blueJungleMinionKills"] == 0) & (df["redJungleMinionKills"] == 0)].index, inplace=True)
+
+
 def clear_outliers(df):
     df.drop(df[(df["redWardPlaced"] > 190)].index, inplace=True)
     df.drop(df[(df["redWardkills"] > 100)].index, inplace=True)
@@ -383,12 +312,6 @@ def clear_outliers(df):
     df.drop(df[(df["blueWardkills"] > 100)].index, inplace=True)
     df.drop(df[(df["blueTotalMinionKills"] > 1190)].index, inplace=True)
     df.drop(df[(df["blueTotalHeal"] > 130000)].index, inplace=True)
-
-
-def clear_six_zero_rows(df):
-    df.drop(df[(df["blueWardPlaced"] == 0) & (df["redWardPlaced"] == 0) &
-               (df["blueWardkills"] == 0) & (df["redWardkills"] == 0) &
-               (df["blueJungleMinionKills"] == 0) & (df["redJungleMinionKills"] == 0)].index, inplace=True)
 
 
 def replace_missing_values(df):
@@ -474,6 +397,27 @@ def compare_team_cat(val, winner):
         return 0
 
 
+def combine_tower_baron_and_jungles(df):
+    df.replace('Red', 0, inplace=True)
+    df.replace('Blue', 1, inplace=True)
+
+    df['jungleDiff'] = df.apply(lambda row: row['redJungleMinionKills'] - row['blueJungleMinionKills'], axis=1)
+    df['towerBaron'] = df.apply(lambda row: compare_tower_baron(row['FirstTower'], row['FirstBaron'], row['win']),
+                                axis=1)
+
+    return df
+
+
+def compare_tower_baron(cat1, cat2, winner):
+    if cat1 == cat2:
+        if cat1 == winner:
+            return 2
+        else:
+            return 0
+    else:
+        return 1
+
+
 def stat_diff_winner_loser_num(df):
     win_val = df['winnerWardPlaced'].mean()
     lose_val = df['loserWardPlaced'].mean()
@@ -532,69 +476,131 @@ def stat_diff_winner_loser_cat(df):
     calculate_percent(win_val, lose_val)
 
 
-def stat_diff_winner_loser_num_binary(df):
-    win_val = df['wardPlaced'].mean()
-    lose_val = 1 - win_val
-    print('winnerWardPlaced:        ', round(win_val, 2))
-    print('loserWardPlaced:         ', round(lose_val, 2))
-    calculate_percent(win_val, lose_val)
-
-    win_val = df['wardKills'].mean()
-    lose_val = 1 - win_val
-    print('winnerWardKills:         ', round(win_val, 2))
-    print('loserWardKills:          ', round(lose_val, 2))
-    calculate_percent(win_val, lose_val)
-
-    win_val = df['totalMinionKills'].mean()
-    lose_val = 1 - win_val
-    print('winnerTotalMinionKills:  ', round(win_val, 2))
-    print('loserTotalMinionKills:   ', round(lose_val, 2))
-    calculate_percent(win_val, lose_val)
-
-    win_val = df['jungleMinionKills'].mean()
-    lose_val = 1 - win_val
-    print('winnerJungleMinionKills: ', round(win_val, 2))
-    print('loserJungleMinionKills:  ', round(lose_val, 2))
-    calculate_percent(win_val, lose_val)
-
-    win_val = df['totalHeal'].mean()
-    lose_val = 1 - win_val
-    print('winnerTotalHeal:         ', round(win_val, 2))
-    print('loserTotalHeal:          ', round(lose_val, 2))
-    calculate_percent(win_val, lose_val)
-
-
 def calculate_percent(win_val, lose_val):
     increase_percent = ((win_val - lose_val) / lose_val) * 100
     print('increase percent:        ', round(increase_percent, 2), '%\n')
 
 
-def combine_numerical_columns_binary(df):
-    df['wardPlaced'] = df.apply(
-        lambda row: compare_team_cat(winner_team(row['redWardPlaced'], row['blueWardPlaced']), row['win']), axis=1)
-    df['wardKills'] = df.apply(
-        lambda row: compare_team_cat(winner_team(row['redWardKills'], row['blueWardKills']), row['win']), axis=1)
-    df['totalMinionKills'] = df.apply(
-        lambda row: compare_team_cat(winner_team(row['redTotalMinionKills'], row['blueTotalMinionKills']), row['win']),
-        axis=1)
-    df['jungleMinionKills'] = df.apply(
-        lambda row: compare_team_cat(winner_team(row['redJungleMinionKills'], row['blueJungleMinionKills']),
-                                     row['win']), axis=1)
-    df['totalHeal'] = df.apply(
-        lambda row: compare_team_cat(winner_team(row['redTotalHeal'], row['blueTotalHeal']), row['win']), axis=1)
+def gaussian_naive_bayes(data, target):
+    x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
+    gnb_model = GaussianNB()
+    gnb_model.fit(x_train, y_train.values.ravel())
 
-    df.drop(['blueWardPlaced', 'redWardPlaced', 'blueWardKills', 'redWardKills',
-             'blueTotalMinionKills', 'redTotalMinionKills', 'blueJungleMinionKills', 'redJungleMinionKills',
-             'blueTotalHeal', 'redTotalHeal'], axis=1, inplace=True)
-
-    return df
+    return gnb_model
 
 
-def winner_team(red_val, blue_val):
-    if red_val > blue_val:
-        return 'Red'
-    else:
-        return 'Blue'
+def accuracy_score_comparison(df):
+    target = df[['win']]
+
+    print("'FirstTower' and 'FirstBaron'")
+    data = df[['FirstTower', 'FirstBaron']]
+    print("accuracy score: ", round(gnb_accuracy_score(data, target), 4), '\n')
+
+    print("'redJungleMinionKills' and 'blueJungleMinionKills'")
+    data = df[['redJungleMinionKills', 'blueJungleMinionKills']]
+    print("accuracy score: ", round(gnb_accuracy_score(data, target), 4), '\n')
+
+    print("'FirstTower' and 'jungleDiff'")
+    data = df[['FirstTower', 'jungleDiff']]
+    print("accuracy score: ", round(gnb_accuracy_score(data, target), 4), '\n')
+
+    print("'towerBaron' and 'jungleDiff'")
+    data = df[['towerBaron', 'jungleDiff']]
+    print("accuracy score: ", round(gnb_accuracy_score(data, target), 4), '\n')
+
+
+def gnb_accuracy_score(data, target):
+    x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
+    gnb_model = GaussianNB()
+    gnb_model.fit(x_train, y_train.values.ravel())
+
+    y_model = gnb_model.predict(x_test)
+
+    return metrics.accuracy_score(y_test, y_model)
+
+
+def gnb_filled_contour(data, target):
+    clf = gaussian_naive_bayes(data, target)
+
+    x_min, x_max = data.loc[:, 'towerBaron'].min() - 1, data.loc[:, 'towerBaron'].max() + 1
+    y_min, y_max = data.loc[:, 'jungleDiff'].min() - 1, data.loc[:, 'jungleDiff'].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.05), np.arange(y_min, y_max, 0.05))
+
+    z = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    z = np.argmax(z, axis=1)
+    z = z.reshape(xx.shape)
+
+    plt.contourf(xx, yy, z, cmap='Set1', alpha=0.5)
+    plt.colorbar()
+    plt.clim(0, 5)
+    fig = plt.gcf()
+    fig.set_size_inches(12, 8)
+    plt.xlabel('towerBaron')
+    plt.ylabel('jungleDiff')
+    return plt
+
+
+def gnb_contour_with_failed_scatter(data, target):
+    clf = gaussian_naive_bayes(data, target)
+
+    ax = gnb_filled_contour(data, target)
+    y_pred_full = clf.predict(data)
+    y_pred_series = pd.Series(y_pred_full)
+    target_series = pd.Series(target['win'])
+
+    failed_data = []
+    for i in range(len(y_pred_series)):
+        if y_pred_series[i] != target_series[i]:
+            failed_data.append(i)
+
+    new_data = pd.DataFrame(columns=['towerBaron', 'jungleDiff', 'win'])
+    i = 0
+    for f in failed_data:
+        new_data.loc[i] = ([data.loc[f]['towerBaron']] + [data.loc[f]['jungleDiff']] + [target['win'].loc[f]])
+        i += 1
+
+    tmp = new_data.sample(2000)
+    sns.scatterplot(data=tmp, x='towerBaron', y='jungleDiff', hue='win', palette='Set1')
+    fig = ax.gcf()
+    fig.set_size_inches(12, 8)
+
+    return ax
+
+
+def decision_tree_clf_report(data, target, depth, report):
+    x_train, x_test, y_train, y_test = train_test_split(data, target, test_size=0.2, random_state=1)
+    clf = DecisionTreeClassifier(max_depth=depth)
+    clf = clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+    if report:
+        print(metrics.classification_report(y_test, y_pred))
+
+    return clf
+
+
+def tree_permutation_importance_plot(data, target, depth=None):
+    clf = decision_tree_clf_report(data, target, depth, report=True)
+    result = permutation_importance(clf, data, target, n_repeats=10, random_state=0)
+    plt.bar(range(len(data.columns)), result['importances_mean'])
+    plt.xticks(ticks=range(len(data.columns)), labels=data.columns, rotation=90)
+    plt.tight_layout()
+    plt.show()
+
+
+def tree_visualization(data, target, img_name, depth=None):
+    clf = decision_tree_clf_report(data, target, depth, report=False)
+    dot_data = StringIO()
+    export_graphviz(clf, out_file=dot_data, filled=True, rounded=True,
+                    feature_names=data.columns, class_names=['0', '1'])
+    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+    graph.write_png(img_name)
+    Image(graph.create_png())
+
+
+def intro():
+    df = pd.read_csv("lol5.csv")
+    print(df.shape)
+    print(df.dtypes)
 
 
 def initial_data_analysis():
@@ -638,82 +644,97 @@ def exploratory_data_analysis():
 
     red_data_pair_plot(df)
     blue_data_pair_plot(df)
-    pair_plot(df, 'scatter')
-    pair_plot(df, 'kde')
+    opponent_pair_plot(df, 'scatter')
+    opponent_pair_plot(df, 'kde')
 
     df = combine_numerical_columns(df)
-    combined_columns_box_plots(df)
+    combined_columns_box_plots_num(df)
     stat_diff_winner_loser_num(df)
-    df.to_csv('win_vs_lose.csv', index=False)
-
-    df = pd.read_csv("clean_lol.csv")
 
     df = combine_categorical_columns(df)
     stat_diff_winner_loser_cat(df)
     combined_columns_bar_plots_cat(df)
 
-    df = combine_numerical_columns_binary(df)
-    stat_diff_winner_loser_num_binary(df)
-    combined_columns_bar_plots_num(df)
-    df.to_csv('binary_lol.csv', index=False)
+    df = pd.read_csv("clean_lol.csv")
+    df = combine_tower_baron_and_jungles(df)
+    full_correlation_heatmap(df)
+
+
+def classification_model():
+    df = pd.read_csv("clean_lol.csv")
+    df = combine_tower_baron_and_jungles(df)
+
+    df.replace('Red', 0, inplace=True)
+    df.replace('Blue', 1, inplace=True)
+
+    accuracy_score_comparison(df)
+
+    sns.catplot(x="towerBaron", y="jungleDiff", hue="win", kind="bar", data=df, palette=['red', 'blue'])
+    plt.tight_layout()
+    plt.show()
+
+    sns.catplot(x="towerBaron", y="jungleDiff", hue="win", kind="point", data=df, palette=['red', 'blue'])
+    plt.tight_layout()
+    plt.show()
+
+    sns.stripplot(x="towerBaron", y="jungleDiff", hue="win", alpha=.5, data=df, palette=['red', 'blue'])
+    plt.tight_layout()
+    plt.show()
+
+    data = df[['towerBaron', 'jungleDiff']]
+    target = df[['win']]
+
+    p = gnb_contour_with_failed_scatter(data, target)
+    p.show()
+
+    print('=============== Baseline Tree ===============')
+    df = pd.read_csv("lol5.csv")
+    df.drop(['gameId'], axis=1, inplace=True)
+    df.dropna(inplace=True)
+    df.replace('Red', 0, inplace=True)
+    df.replace('Blue', 1, inplace=True)
+    target = df[['win']]
+    df.drop(['win'], axis=1, inplace=True)
+    tree_permutation_importance_plot(df, target)
+
+    print('=============== Manipulated Data Tree ===============')
+
+    df = pd.read_csv("clean_lol.csv")
+    df = combine_tower_baron_and_jungles(df)
+    df.replace('Red', 0, inplace=True)
+    df.replace('Blue', 1, inplace=True)
+    target = df[['win']]
+    df.drop(['win'], axis=1, inplace=True)
+    four_feature_df = df[['towerBaron', 'jungleDiff', 'FirstTower', 'redTotalHeal']]
+
+    print('-------- 17 features - full depth --------')
+    tree_permutation_importance_plot(df, target)
+    tree_visualization(df, target, 'full_tree.png')
+
+    print('-------- 4 features - full depth --------')
+    tree_permutation_importance_plot(four_feature_df, target)
+    tree_visualization(four_feature_df, target, 'four_feature_tree.png')
+
+    print('-------- 4 features - depth 8 --------')
+    tree_permutation_importance_plot(four_feature_df, target, 8)
+
+    print('-------- 4 features - depth 4 --------')
+    tree_permutation_importance_plot(four_feature_df, target, 4)
+
+    print('-------- 4 features - depth 5 --------')
+    tree_permutation_importance_plot(four_feature_df, target, 5)
+    tree_visualization(four_feature_df, target, 'four_feature_tree_depth_5.png', 5)
 
 
 if __name__ == '__main__':
     print('1: ')
-    # initial_data_analysis()
+    intro()
 
     print('2: ')
-    # exploratory_data_analysis()
+    initial_data_analysis()
 
-    # data = pd.read_csv("clean_lol.csv")
+    print('3: ')
+    exploratory_data_analysis()
 
-    # correlation_heatmap_numerical()
-    # print(data.head())
-    # correlation_heatmap_numerical()
-
-    # data = combine_columns()
-
-    # data = data.drop(['FirstBlood', 'FirstTower', 'FirstBaron', 'FirstDragon'])
-    # data.to_csv('win_vs_lose_num.csv', index=False)
-    #
-    # data = pd.read_csv("clean_lol.csv")
-    # data = data[['win', 'FirstBlood', 'FirstTower', 'FirstBaron', 'FirstDragon']]
-    # data = combine_categorical_columns()
-    # data.to_csv('win_vs_lose_cat.csv', index=False)
-    # #
-    # data = pd.read_csv("lol5.csv")
-    # data.dropna(inplace=True)
-    # data = data[['win', 'FirstBlood', 'FirstTower', 'FirstBaron', 'FirstDragon']]
-    # data = combine_categorical_columns()
-    # data.to_csv('win_vs_lose_cat_origin.csv', index=False)
-    # print('origin:')
-    # data = pd.read_csv("win_vs_lose_cat_origin.csv")
-    # # stat_diff_winner_loser_cat()
-    # combined_columns_bar_plots()
-    # # sns.countplot(x="winnerFirstBlood", palette=['grey', 'green'], data=data)
-    # # plt.xlabel('FirstBlood')
-    # # plt.show()
-    #
-    # print('---------------------')
-    # print('clean:')
-    # data = pd.read_csv("clean_lol.csv")
-    # sns.pairplot(data, corner=True)
-    # plt.show()
-
-    # data = combine_categorical_columns()
-    # print(data.head())
-
-    # data.drop(['gameDuration', 'FirstBlood', 'FirstTower', 'FirstBaron', 'FirstDragon'], inplace=True, axis=1)
-
-    # combine_numerical_columns_binary()
-
-    # print(data.head())
-    # pair_plot()
-
-
-    # data.replace('Red', 0, inplace=True)
-    # data.replace('Blue', 1, inplace=True)
-    # full_cat = combine_columns()
-    # full_num = data.drop(['win', 'FirstBlood', 'FirstTower', 'FirstBaron', 'FirstDragon'])
-    # print(full_cat.head())
-    # full_cat.to_csv('full_cat.csv', index=False)
+    print('4: ')
+    classification_model()
